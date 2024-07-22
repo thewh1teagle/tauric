@@ -7,7 +7,7 @@ Potential: Use tauri from `Python`, `Go`, `TypeScript` etc..
 ## Usage
 
 See [BUILDING.md](BUILDING.md)
-After building it, just run 
+After building it, just run
 
 ```console
 python bindings/python/main.py
@@ -16,7 +16,7 @@ python bindings/python/main.py
 Then you can paste in the console
 
 ```js
-invoke("command", {args: {"hello": "world"}})
+invoke("command", { args: { hello: "world" } });
 ```
 
 ## Todo
@@ -35,3 +35,4 @@ Goal: No need for Cargo / Rust!
 - [ ] NPM package
 - [ ] CI to build cross platform packages with static / dynamic lib
 - [ ] Tauri plugins from shared libraries
+- [ ] Load local files using custom protocl **ONLY** after bindings enabled it.
