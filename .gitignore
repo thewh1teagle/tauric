@@ -1,0 +1,4 @@
+target/
+c-api/gen/
+node_modules/
+c-api/icons/*
