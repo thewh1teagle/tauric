@@ -36,3 +36,4 @@ Goal: No need for Cargo / Rust!
 - [ ] CI to build cross platform packages with static / dynamic lib
 - [ ] Tauri plugins from shared libraries
 - [ ] Load local files using custom protocl **ONLY** after bindings enabled it.
+- [ ] API function to enable hot reload by register a folder to watch. Rust will iterate windows and reload them.
