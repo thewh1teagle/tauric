@@ -1,3 +1,5 @@
+//go:build darwin || freebsd || linux || windows
+
 package main
 
 import (
@@ -14,14 +16,14 @@ func getLibrary() string {
 	case "linux":
 		return "libtauric.so"
 	case "windows":
-		return "libtauric.dll"
+		return "tauric.dll"
 	default:
 		panic(fmt.Errorf("GOOS=%s is not supported", runtime.GOOS))
 	}
 }
 
 func main() {
-	lib, err := purego.Dlopen(getLibrary(), purego.RTLD_NOW|purego.RTLD_GLOBAL)
+	lib, err := openLibrary(getLibrary())
 	if err != nil {
 		panic(err)
 	}
