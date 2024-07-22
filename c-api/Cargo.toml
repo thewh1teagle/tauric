@@ -4,12 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "staticlib"]
 path = "src/lib.rs"
 name = "tauric"
 
 [build-dependencies]
 tauri-build = { version = "=2.0.0-beta.19", features = [] }
+cbindgen = "=0.26.0"
 
 [dependencies]
 ctrlc = "3.4.4"

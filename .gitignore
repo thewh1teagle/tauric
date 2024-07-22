@@ -2,3 +2,8 @@ target/
 c-api/gen/
 node_modules/
 c-api/icons/*
+libtauric.dylib
+libtauric.so
+libtauric.dll
+main
+*.h

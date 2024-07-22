@@ -23,3 +23,15 @@ Build the library by execute
 ```console
 cargo build
 ```
+
+## Create shared library with headers
+
+Install
+```console
+brew install cbindgen
+```
+
+Then execute
+```console
+cbindgen > tauric.h
+```
