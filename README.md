@@ -34,3 +34,4 @@ Goal: No need for Cargo / Rust!
 - [ ] Go package
 - [ ] NPM package
 - [ ] CI to build cross platform packages with static / dynamic lib
+- [ ] Tauri plugins from shared libraries
