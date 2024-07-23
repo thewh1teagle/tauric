@@ -23,6 +23,7 @@ invoke("command", { args: { hello: "world" } });
 
 Goal: No need for Cargo / Rust!
 
+- [ ] Custom IPC protocol crash on macOS when reading a file.
 - [ ] Dynamic icon from Python
 - [ ] Dynamic app name from Python
 - [ ] Dynamic identifier from Python
