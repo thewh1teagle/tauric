@@ -24,7 +24,7 @@ const tauric = define({
 
 const onReadyFunc = () => {
   // free function memory which malloc in c side when it not in use
-  console.log('ready')
+  console.log('nodejs got ready')
   freePointer({
     paramsType: [
       funcConstructor({

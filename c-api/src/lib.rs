@@ -40,6 +40,7 @@ pub extern "C" fn on_command(callback: Option<extern "C" fn(*const c_char)>) {
 #[no_mangle]
 pub extern "C" fn on_ready(callback: Option<extern "C" fn()>) {
     // Store the callback function in the global variable
+    println!("ready register");
     *READY_CALLBACK.lock().unwrap() = callback;
 }
 
@@ -105,6 +106,7 @@ pub extern "C" fn run() -> i32 {
             tauri::async_runtime::spawn(async {
                 let ready_callback = READY_CALLBACK.lock().unwrap().clone();
                 if let Some(callback) = ready_callback {
+                    println!("calling ready callback");
                     callback();
                 }
             });
