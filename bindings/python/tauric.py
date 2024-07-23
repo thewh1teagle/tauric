@@ -61,7 +61,7 @@ class Tauric:
 
     def mount_frontend(self, path) -> None:
         path = path.encode('utf-8')
-        self.tauric.mount_folder(path)
+        self.tauric.mount_frontend(path)
 
     def create_window(self, label: str, url: str) -> None:
         label_encoded = label.encode('utf-8')
