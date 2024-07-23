@@ -7,6 +7,8 @@ libtauric.so
 libtauric.dll
 main
 *.h
-__pycache__
+__pycache__/
+*.pyc
 *.exe
 *.dll
+tauric
