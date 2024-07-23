@@ -59,6 +59,10 @@ class Tauric:
         else:
             print("Tauri application started successfully")
 
+    def mount_frontend(self, path) -> None:
+        path = path.encode('utf-8')
+        self.tauric.mount_folder(path)
+
     def create_window(self, label: str, url: str) -> None:
         label_encoded = label.encode('utf-8')
         url_encoded = url.encode('utf-8')

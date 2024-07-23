@@ -1,0 +1,9 @@
+{
+    "$schema": "../gen/schemas/acl-manifests.json",
+    "identifier": "main",
+    "permissions": [],
+    "windows": ["*"],
+    "remote": {
+        "urls": ["http://*", "https://*"]
+    }
+}
