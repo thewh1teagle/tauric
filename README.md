@@ -28,6 +28,7 @@ Goal: No need for Cargo / Rust!
 - [ ] Dynamic identifier from Python
 - [ ] Dev server with hot reload
 - [ ] Bundle including frontend with Go into a single executable
+- [ ] Bundle with PyInstaller into single executable
 - [ ] Better IPC
 - [ ] Dynamic capabilities
 - [ ] PyPI package
