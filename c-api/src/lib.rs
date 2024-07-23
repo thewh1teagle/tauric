@@ -92,14 +92,30 @@ pub extern "C" fn run() -> i32 {
         .register_uri_scheme_protocol("local", |app, request| {
             println!("local request");
             let front_dir = FRONTEND_DIR.lock().unwrap();
-            let front_dir_opt = front_dir.as_ref();
-            tauri::http::Response::builder()
-            .status(200)
-                .body("<html><h1>Hello world!</h1><button>click</button><script>document.querySelector('button').onclick = () => { invoke('command', {args: {'hello': 'world'}}) }</script></html>".to_string().into_bytes())
-            .unwrap()
+            let front_dir_opt = front_dir.as_ref().unwrap();
+            let mut request_path = request.uri().path();
+            if request_path == "/" {
+                request_path = "index.html";
+            } else if request_path.starts_with('/') {
+                request_path = request_path.strip_prefix("/").unwrap(); // Remove the leading '/'
+            }
+            let path = std::path::PathBuf::from(front_dir_opt).join(request_path);
+            println!("path is {}", path.display());
+
+            if path.exists() {
+                let content = fs::read(path).unwrap();
+                tauri::http::Response::builder()
+                    .status(200)
+                    .body(content)
+                    .unwrap()
+            } else {
+                tauri::http::Response::builder()
+                    .status(404)
+                    .body(Vec::new())
+                    .unwrap()
+            }
         })
         .setup(|app| {
-            
             let mut app_handle = APP_HANDLE.lock().unwrap();
             *app_handle = Some(app.handle().clone());
 

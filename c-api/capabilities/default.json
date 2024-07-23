@@ -1,9 +1,14 @@
 {
-    "$schema": "../gen/schemas/acl-manifests.json",
+    "$schema": "../gen/schemas/capabilities.json",
     "identifier": "main",
     "permissions": [],
-    "windows": ["*"],
+    "windows": [
+        "*"
+    ],
     "remote": {
-        "urls": ["http://*", "https://*"]
+        "urls": [
+            "http://*",
+            "https://*"
+        ]
     }
 }
