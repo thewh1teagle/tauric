@@ -1,7 +1,6 @@
 use std::{
     ffi::{c_char, CStr, CString},
     fs,
-    path::PathBuf,
     str::FromStr,
     sync::Mutex,
 };
@@ -78,8 +77,9 @@ pub extern "C" fn create_window(label: *const c_char, url: *const c_char) {
 
 #[no_mangle]
 pub extern "C" fn close() {
-    let app_handle = APP_HANDLE.lock().unwrap().clone().unwrap();
-    app_handle.exit(0);
+    if let Some(app_handle) = APP_HANDLE.lock().unwrap().clone() {
+        app_handle.exit(0);
+    }    
 }
 
 #[no_mangle]
@@ -89,7 +89,7 @@ pub extern "C" fn run() -> i32 {
     })
     .unwrap();
     let result = Builder::default()
-        .register_uri_scheme_protocol("local", |app, request| {
+        .register_uri_scheme_protocol("mounted", |app, request| {
             println!("local request");
             let front_dir = FRONTEND_DIR.lock().unwrap();
             let front_dir_opt = front_dir.as_ref().unwrap();
@@ -104,15 +104,19 @@ pub extern "C" fn run() -> i32 {
 
             if path.exists() {
                 let content = fs::read(path).unwrap();
-                tauri::http::Response::builder()
+                let result = tauri::http::Response::builder()
                     .status(200)
                     .body(content)
-                    .unwrap()
+                    .unwrap();
+                println!("result is {:?}", result);
+                return result;
             } else {
-                tauri::http::Response::builder()
+                let result = tauri::http::Response::builder()
                     .status(404)
                     .body(Vec::new())
-                    .unwrap()
+                    .unwrap();
+                println!("result is {:?}", result);
+                return result;
             }
         })
         .setup(|app| {
