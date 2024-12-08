@@ -23,6 +23,6 @@ pip install pyaec
 
 See [examples](examples)
 
-## Todo
+## Roadmap
 
-See [#2](https://github.com/thewh1teagle/tauric/issues/2)
+See [Roadmap](https://github.com/thewh1teagle/tauric/issues/2)
