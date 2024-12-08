@@ -1,0 +1,16 @@
+[project]
+name = "tauripy"
+version = "0.1.0-beta.0"
+description = "Create tauri desktop app in Python"
+readme = "README.md"
+authors = [
+    { name = "thewh1teagle", email = "61390950+thewh1teagle@users.noreply.github.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel.hooks.custom]

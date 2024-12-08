@@ -29,7 +29,7 @@ fn main() {
     tauri_build::build();
     cbindgen::generate_with_config(&crate_dir, config)
       .unwrap()
-      .write_to_file("tauric.h");
+      .write_to_file("tauri.h");
 
       if target.contains("apple") {
         // On (older) OSX we need to link against the clang runtime,

@@ -1,8 +1,22 @@
 import ctypes
 import platform
-from pathlib import Path
-from typing import Callable
+import os
 
+def load_library():
+    try:
+        ext = ".dll" if platform.system() == "Windows" else ".so" if platform.system() == "Linux" else ".dylib"
+        lib_name = "tauri" + ext if platform.system() == "Windows" else 'libtauri' + ext
+
+        # Same dir as this file
+        lib_path = os.path.join(os.path.dirname(__file__), lib_name)
+
+        lib = ctypes.CDLL(lib_path)
+
+        return lib
+
+    except OSError as e:
+        print(f"Error loading shared library from {lib_path}: {e}")
+        return None
 
 def create_command_callback(command_callback):
     return ctypes.CFUNCTYPE(None, ctypes.c_char_p)(command_callback)
@@ -11,32 +25,13 @@ def create_ready_callback(ready_callback):
     return ctypes.CFUNCTYPE(None)(ready_callback)
 
 class Tauric:
-    def __init__(self) -> None:
-        self.dylib_path = self.find_library_path()
-        self.tauric = ctypes.CDLL(self.dylib_path)
+    def __init__(self, identifier: str, product_name: str, icon: str = None) -> None:
+        self.identifier = identifier
+        self.product_name = product_name
+        self.icon = icon
+        self.tauric = load_library()
         self.setup_functions()
 
-    def find_library_path(self) -> Path:
-        system = platform.system()
-        lib_name = ""
-
-        if system == "Windows":
-            lib_name = "tauric.dll"
-        elif system == "Darwin":
-            lib_name = "libtauric.dylib"
-        else:
-            lib_name = "libtauric.so"
-
-        base_path = Path(__file__).resolve().parent / '../../target'
-        debug_path = base_path / 'debug' / lib_name
-        release_path = base_path / 'release' / lib_name
-
-        if debug_path.exists():
-            return debug_path
-        elif release_path.exists():
-            return release_path
-        else:
-            raise FileNotFoundError(f"Library file not found in 'debug' or 'release' directories.")
 
     def setup_functions(self) -> None:
         self.tauric.run.restype = ctypes.c_int
@@ -53,7 +48,11 @@ class Tauric:
         self.tauric.on_ready(ready_c_callback)
 
     def run_app(self) -> None:
-        result = self.tauric.run()
+        icon = None
+        if self.icon:
+            icon = self.icon
+            icon = icon.encode('utf-8')
+        result = self.tauric.run(self.identifier.encode('utf-8'), self.product_name.encode('utf-8'), icon)
         if result != 0:
             print("Failed to start the Tauri application")
         else:

@@ -1,10 +1,7 @@
 use std::{
-    ffi::{c_char, CStr, CString},
-    fs,
-    str::FromStr,
-    sync::Mutex,
+    ffi::{c_char, CStr, CString}, fs, path::PathBuf, str::FromStr, sync::Mutex
 };
-use tauri::{AppHandle, Builder, Url, WebviewWindowBuilder};
+use tauri::{image::{self, Image}, utils::config::TrayIconConfig, AppHandle, Builder, Manager, Url, WebviewWindowBuilder};
 
 type IPCCallbackFn = extern "C" fn(*const c_char);
 type ReadyCallbackFn = extern "C" fn();
@@ -52,7 +49,7 @@ pub extern "C" fn mount_frontend(path: *const c_char) {
 }
 
 #[no_mangle]
-pub extern "C" fn create_window(label: *const c_char, url: *const c_char) {
+pub extern "C" fn create_window(label: *const c_char, title: *const c_char, url: *const c_char) {
     let label = unsafe {
         assert!(!label.is_null());
         CStr::from_ptr(label).to_str().unwrap().to_owned()
@@ -62,12 +59,17 @@ pub extern "C" fn create_window(label: *const c_char, url: *const c_char) {
         assert!(!url.is_null());
         CStr::from_ptr(url).to_str().unwrap().to_owned()
     };
+    let title = unsafe {
+        assert!(!title.is_null());
+        CStr::from_ptr(title).to_str().unwrap().to_owned()
+    };
     let app_handle = APP_HANDLE.lock().unwrap().clone().unwrap();
     WebviewWindowBuilder::new(
         &app_handle,
         label,
         tauri::WebviewUrl::External(Url::from_str(&url).unwrap()),
     )
+    .title(title)
     .inner_size(800.0, 600.0)
     .visible(true)
     .initialization_script("window.addEventListener('DOMContentLoaded', () => { window.invoke = window.__TAURI__.core.invoke; });")
@@ -83,11 +85,36 @@ pub extern "C" fn close() {
 }
 
 #[no_mangle]
-pub extern "C" fn run() -> i32 {
+pub extern "C" fn run(identifier: *const c_char, product_name: *const c_char, icon_path: *const c_char) -> i32 {
     ctrlc::set_handler(move || {
         close();
     })
     .unwrap();
+    let mut context = tauri::generate_context!();
+    let config = context.config_mut();
+    let identifier = unsafe {
+        assert!(!identifier.is_null());
+        CStr::from_ptr(identifier).to_str().unwrap().to_owned()
+    };
+    let product_name = unsafe {
+        assert!(!product_name.is_null());
+        CStr::from_ptr(product_name).to_str().unwrap().to_owned()
+    };
+    config.identifier = identifier;
+    config.product_name = Some(product_name);
+    if !icon_path.is_null() {
+        
+        let icon_path = unsafe {
+            CStr::from_ptr(icon_path).to_str().unwrap().to_owned()
+        };
+        
+        config.bundle.icon = vec![icon_path.clone()];
+        println!("icons: {:?}", config.bundle.icon);
+        println!("custom icon {}", PathBuf::from(icon_path.clone()).exists());
+        config.app.tray_icon = Some(TrayIconConfig{icon_path: PathBuf::from(icon_path), ..Default::default()});
+    }
+    
+    
     let result = Builder::default()
         .register_uri_scheme_protocol("mounted", |app, request| {
             println!("local request");
@@ -121,6 +148,7 @@ pub extern "C" fn run() -> i32 {
         })
         .setup(|app| {
             let mut app_handle = APP_HANDLE.lock().unwrap();
+            
             *app_handle = Some(app.handle().clone());
 
             tauri::async_runtime::spawn(async {
@@ -134,7 +162,7 @@ pub extern "C" fn run() -> i32 {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![command])
-        .run(tauri::generate_context!());
+        .run(context);
 
     // Check if the application started successfully
     match result {
