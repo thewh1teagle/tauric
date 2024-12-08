@@ -1,5 +1,6 @@
 """
 pip install tauripy
+python main.py
 """
 from tauripy import Tauri, create_command_callback, create_ready_callback
 from pathlib import Path
