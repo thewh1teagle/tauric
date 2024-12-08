@@ -24,7 +24,7 @@ def create_command_callback(command_callback):
 def create_ready_callback(ready_callback):
     return ctypes.CFUNCTYPE(None)(ready_callback)
 
-class Tauric:
+class Tauri:
     def __init__(self, identifier: str, product_name: str, icon: str = None) -> None:
         self.identifier = identifier
         self.product_name = product_name
