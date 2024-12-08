@@ -1,4 +1,4 @@
-name: Publish libtauri
+name: Publish libtauric
 
 on:
   workflow_dispatch:
@@ -12,25 +12,25 @@ jobs:
         include:
           - platform: "macos-latest" # macOS arm64
             args: "--target aarch64-apple-darwin"
-            build-dir: "libtauri-osx-aarch64"
+            build-dir: "libtauric-osx-aarch64"
             archive: "tar"
             target: "aarch64-apple-darwin"
 
           - platform: "macos-latest" # macOS x86-64
             args: "--target x86_64-apple-darwin"
-            build-dir: "libtauri-osx-x86-64"
+            build-dir: "libtauric-osx-x86-64"
             archive: "tar"
             target: "x86_64-apple-darwin"
 
           - platform: "ubuntu-22.04" # Linux x86_64
             args: ""
-            build-dir: "libtauri-linux-x86-64"
+            build-dir: "libtauric-linux-x86-64"
             archive: "tar"
             target: "x86_64-unknown-linux-gnu"
 
           - platform: "windows-latest" # Windows x86_64
             args: "--target x86_64-pc-windows-msvc"
-            build-dir: "libtauri-win-x86-64"
+            build-dir: "libtauric-win-x86-64"
             archive: "zip"
             target: "x86_64-pc-windows-msvc"
 
@@ -59,21 +59,21 @@ jobs:
       - name: Set up build directory
         run: mkdir -p ${{ matrix.build-dir }}
 
-      - name: Build libtauri
-        run: cargo build -p libtauri --release ${{ matrix.args }}
+      - name: Build libtauric
+        run: cargo build -p libtauric --release ${{ matrix.args }}
 
       - name: Copy files
         run: |
           # Headers
-          cp libtauri/tauri.h "${{ matrix.build-dir }}/"
+          cp libtauric/tauri.h "${{ matrix.build-dir }}/"
           # Unix
-          cp -f "target/${{ matrix.target }}/release/libtauri.a" "${{ matrix.build-dir }}/" || :
-          cp -f "target/${{ matrix.target }}/release/libtauri.so" "${{ matrix.build-dir }}/" || :
-          cp -f "target/${{ matrix.target }}/release/libtauri.dylib" "${{ matrix.build-dir }}/" || :
+          cp -f "target/${{ matrix.target }}/release/libtauric.a" "${{ matrix.build-dir }}/" || :
+          cp -f "target/${{ matrix.target }}/release/libtauric.so" "${{ matrix.build-dir }}/" || :
+          cp -f "target/${{ matrix.target }}/release/libtauric.dylib" "${{ matrix.build-dir }}/" || :
 
           # Linux?
-          cp -f "target/release/libtauri.a" "${{ matrix.build-dir }}/" || :
-          cp -f "target/release/libtauri.so" "${{ matrix.build-dir }}/" || :
+          cp -f "target/release/libtauric.a" "${{ matrix.build-dir }}/" || :
+          cp -f "target/release/libtauric.so" "${{ matrix.build-dir }}/" || :
 
           # Windows
           cp -f "target/${{ matrix.target }}/release/tauri.lib" "${{ matrix.build-dir }}/" || :

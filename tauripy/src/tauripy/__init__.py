@@ -5,7 +5,7 @@ import os
 def load_library():
     try:
         ext = ".dll" if platform.system() == "Windows" else ".so" if platform.system() == "Linux" else ".dylib"
-        lib_name = "tauri" + ext if platform.system() == "Windows" else 'libtauri' + ext
+        lib_name = "tauric" + ext if platform.system() == "Windows" else 'libtauric' + ext
 
         # Same dir as this file
         lib_path = os.path.join(os.path.dirname(__file__), lib_name)

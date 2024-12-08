@@ -1,12 +1,12 @@
 [package]
-name = "libtauri"
+name = "libtauric"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
 crate-type = ["staticlib", "cdylib", "rlib"]
 path = "src/lib.rs"
-name = "libtauri"
+name = "tauric"
 
 [[bin]]
 name = "main"
