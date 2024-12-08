@@ -1,5 +1,7 @@
 # tauric
 
+[![PyPi Version](https://img.shields.io/pypi/v/tauripy?color=36719F&logo=python)](https://pypi.org/project/tauripy)
+
 C-API for [tauri](https://tauri.app) written in Rust.
 
 Potential: Use tauri from `Python`, `Go`, `TypeScript` etc..
