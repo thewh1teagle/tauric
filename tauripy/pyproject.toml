@@ -1,6 +1,6 @@
 [project]
 name = "tauripy"
-version = "0.1.0-beta.0"
+version = "0.1.0-beta.1"
 description = "Create tauri desktop app in Python"
 readme = "README.md"
 authors = [
@@ -8,6 +8,9 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = []
+
+[project.urls]
+Repository = "https://github.com/thewh1teagle/tauric"
 
 [build-system]
 requires = ["hatchling"]
