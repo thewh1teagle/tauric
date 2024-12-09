@@ -20,6 +20,6 @@ cbindgen = "=0.26.0"
 [dependencies]
 ctrlc = "3.4.4"
 serde_json = "1.0.120"
-tauri = { version = "2", features = ["devtools"] }
+tauri = { version = "2", features = ["devtools", "image-png", "image-ico"] }
 tauri-plugin-dialog = "2"
 tokio = { version = "1.39.1", features = ["fs"] }
