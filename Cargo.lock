@@ -1907,19 +1907,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tauric"
-version = "0.1.0"
-dependencies = [
- "cbindgen",
- "ctrlc",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tokio",
-]
-
-[[package]]
 name = "linux-raw-sys"
 version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3753,6 +3740,19 @@ checksum = "5993dc129e544393574288923d1ec447c857f3f644187f4fbf7d9a875fbfc4fb"
 dependencies = [
  "embed-resource",
  "toml 0.7.8",
+]
+
+[[package]]
+name = "tauric"
+version = "0.1.0"
+dependencies = [
+ "cbindgen",
+ "ctrlc",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tokio",
 ]
 
 [[package]]
