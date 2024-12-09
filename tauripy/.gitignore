@@ -1,0 +1,14 @@
+# DO NOT DELETE!!!
+# uv use this file when run uv build. 
+# DO NOT DELETE!!!
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
