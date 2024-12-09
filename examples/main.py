@@ -7,8 +7,8 @@ from pathlib import Path
 import json
 
 def on_command(message: bytes):
-    print(f"Received: {message.decode('utf-8')}")
-    return json.dumps({'message': 'Hello from Python!'}).encode('utf-8')
+    print(f"Received: {message.decode()}")
+    return json.dumps({'message': 'Hello from Python!'}).encode()
 
 tauric = Tauri("com.tauric.dev", "tauric")
 tauric.mount_frontend('./dist')

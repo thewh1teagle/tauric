@@ -24,8 +24,9 @@
 
     <script>
         async function greet() {
-            const {message} = await invoke('Hello from JavaScript!')
-            alert(message)
+            const resp = await invoke('Hello from JavaScript!')
+            console.log(resp)
+            // alert(resp)
         }
     </script>
 </body>

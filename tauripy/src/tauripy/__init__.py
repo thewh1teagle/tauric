@@ -45,7 +45,7 @@ class Tauri:
     def on_command(self, command_callback) -> None:
         # Most outlive static
         self.command_callback = command_callback
-        self.command_callback_c = create_command_callback(self.command_callback)
+        self.command_callback_c = ctypes.CFUNCTYPE(ctypes.c_char_p, [ctypes.c_char_p])(self.command_callback)
         self.tauric.TauricOnCommand(self.command_callback_c)
 
     def on_ready(self, ready_c_callback) -> None:
