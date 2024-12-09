@@ -2,7 +2,13 @@ name: Publish libtauric
 
 on:
   workflow_dispatch:
-
+    inputs:
+      publish-pypi:
+        default: false
+        required: false
+        description: "Trigger publish-pypi after deply"
+        type: boolean
+     
 jobs:
   build:
     name: ${{ matrix.target }}
@@ -96,3 +102,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         shell: bash
+
+      - name: Trigger publish-pypi
+        run: gh workflow run publish-pypi.yml
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        if: inputs.publish-pypi
+        
