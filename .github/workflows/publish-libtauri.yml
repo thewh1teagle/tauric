@@ -102,10 +102,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         shell: bash
-
+        
+  publish-pypi:
+    name: Trigger publish-pypi
+    needs: build
+    if: inputs.publish-pypi == 'true'
+    runs-on: ubuntu-latest
+    steps:
       - name: Trigger publish-pypi
         run: gh workflow run publish-pypi.yml
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        if: inputs.publish-pypi
-        
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}    
