@@ -19,7 +19,7 @@ def load_library():
         return None
 
 def create_command_callback(command_callback):
-    return ctypes.CFUNCTYPE(None, ctypes.c_char_p)(command_callback)
+    return ctypes.CFUNCTYPE(ctypes.c_char_p, ctypes.c_char_p)(command_callback)
 
 def create_ready_callback(ready_callback):
     return ctypes.CFUNCTYPE(None)(ready_callback)
@@ -34,26 +34,28 @@ class Tauri:
 
 
     def setup_functions(self) -> None:
-        self.tauric.run.restype = ctypes.c_int
-        self.tauric.run.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
-        self.tauric.create_window.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
-        self.tauric.create_window.restype = None
-        self.tauric.close.restype = None
-        self.tauric.on_ready.restype = None
-        self.tauric.on_command.restype = None
+        self.tauric.TauricRun.restype = ctypes.c_int
+        self.tauric.TauricRun.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.CFUNCTYPE(None)]
+        self.tauric.TauricCreateWindow.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+        self.tauric.TauricCreateWindow.restype = None
+        self.tauric.TauricClose.restype = None
+        self.tauric.TauricOnReady.restype = None
+        self.tauric.TauricOnCommand.restype = None
 
     def on_command(self, command_c_callback) -> None:
-        self.tauric.on_command(command_c_callback)
+        self.tauric.TauricOnCommand(command_c_callback)
 
     def on_ready(self, ready_c_callback) -> None:
-        self.tauric.on_ready(ready_c_callback)
+        self.tauric.TauricOnReady(ready_c_callback)
 
-    def run_app(self) -> None:
+    def run(self, on_ready = None) -> None:
+        if on_ready:
+            on_ready = ctypes.CFUNCTYPE(None)(on_ready)
         icon = None
         if self.icon:
             icon = self.icon
             icon = icon.encode('utf-8')
-        result = self.tauric.run(self.identifier.encode('utf-8'), self.product_name.encode('utf-8'), icon)
+        result = self.tauric.TauricRun(self.identifier.encode('utf-8'), self.product_name.encode('utf-8'), icon, on_ready)
         if result != 0:
             print("Failed to start the Tauri application")
         else:
@@ -61,15 +63,13 @@ class Tauri:
 
     def mount_frontend(self, path) -> None:
         path = path.encode('utf-8')
-        self.tauric.mount_frontend(path)
+        self.tauric.TauricMountFrontend(path)
 
     def create_window(self, label: str, title: str, url: str) -> None:
         label_encoded = label.encode('utf-8')
         url_encoded = url.encode('utf-8')
         title = title.encode('utf-8')
-        print('Creating window...')
-        self.tauric.create_window(label_encoded, title, url_encoded)
-        print("Created an example window")
+        self.tauric.TauricCreateWindow(label_encoded, title, url_encoded)
 
     def close(self) -> None:
-        self.tauric.close()
+        self.tauric.TauricClose()

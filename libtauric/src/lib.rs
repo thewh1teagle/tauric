@@ -1,9 +1,10 @@
 use std::{
     ffi::{c_char, CStr, CString}, fs, path::PathBuf, str::FromStr, sync::Mutex
 };
-use tauri::{image::{self, Image}, utils::config::TrayIconConfig, AppHandle, Builder, Manager, Url, WebviewWindowBuilder};
+use serde_json::Value;
+use tauri::{utils::config::TrayIconConfig, AppHandle, Builder, Url, WebviewWindowBuilder};
 
-type IPCCallbackFn = extern "C" fn(*const c_char);
+type IPCCallbackFn = extern "C" fn(*const c_char) -> *const c_char;
 type ReadyCallbackFn = extern "C" fn();
 
 static APP_HANDLE: Mutex<Option<AppHandle>> = Mutex::new(None);
@@ -12,7 +13,7 @@ static READY_CALLBACK: Mutex<Option<ReadyCallbackFn>> = Mutex::new(None);
 static FRONTEND_DIR: Mutex<Option<String>> = Mutex::new(None);
 
 #[tauri::command]
-fn command(args: serde_json::Value) -> Result<(), String> {
+fn command(args: serde_json::Value) -> Result<Option<Value>, String> {
     let args = serde_json::to_string_pretty(&args).unwrap();
     let callback = IPC_CALLBACK.lock().unwrap().clone();
 
@@ -20,36 +21,45 @@ fn command(args: serde_json::Value) -> Result<(), String> {
         // Convert the string to a C string
         let c_str = CString::new(args).map_err(|e| e.to_string())?;
         // Call the callback function
-        callback(c_str.as_ptr());
+        let resp = callback(c_str.as_ptr());
+        
+        if !resp.is_null() {
+            let c_str_resp = unsafe { CStr::from_ptr(resp) };
+            
+            let resp_str = c_str_resp.to_str().map_err(|e| e.to_string())?;
+
+            // Try to deserialize the string into serde_json::Value
+            let deserialized: Value = serde_json::from_str(resp_str).map_err(|e| e.to_string())?;
+            
+            return Ok(Some(deserialized));
+        }
     } else {
         return Err("Please register command callback using register_commands()".into());
     }
-    Ok(())
+    Ok(None)
 }
 
 #[no_mangle]
-pub extern "C" fn on_command(callback: Option<extern "C" fn(*const c_char)>) {
+pub extern "C" fn TauricOnCommand(callback: IPCCallbackFn) {
     // Store the callback function in the global variable
-    *IPC_CALLBACK.lock().unwrap() = callback;
+    *IPC_CALLBACK.lock().unwrap() = Some(callback);
 }
 
 #[no_mangle]
-pub extern "C" fn on_ready(callback: Option<extern "C" fn()>) {
+pub extern "C" fn TauricOnReady(callback: Option<extern "C" fn()>) {
     // Store the callback function in the global variable
-    println!("ready register");
     *READY_CALLBACK.lock().unwrap() = callback;
 }
 
 #[no_mangle]
-pub extern "C" fn mount_frontend(path: *const c_char) {
+pub extern "C" fn TauricMountFrontend(path: *const c_char) {
     // Store the callback function in the global variable
-    println!("mount frontend");
     let path = unsafe { CStr::from_ptr(path).to_str().unwrap().to_owned() };
     *FRONTEND_DIR.lock().unwrap() = Some(path);
 }
 
 #[no_mangle]
-pub extern "C" fn create_window(label: *const c_char, title: *const c_char, url: *const c_char) {
+pub extern "C" fn TauricCreateWindow(label: *const c_char, title: *const c_char, url: *const c_char) {
     let label = unsafe {
         assert!(!label.is_null());
         CStr::from_ptr(label).to_str().unwrap().to_owned()
@@ -72,22 +82,22 @@ pub extern "C" fn create_window(label: *const c_char, title: *const c_char, url:
     .title(title)
     .inner_size(800.0, 600.0)
     .visible(true)
-    .initialization_script("window.addEventListener('DOMContentLoaded', () => { window.invoke = window.__TAURI__.core.invoke; });")
+    .initialization_script("window.addEventListener('DOMContentLoaded', () => { window.invoke = (args) => window.__TAURI__.core.invoke('command', {args: args}); });")
     .build()
     .unwrap();
 }
 
 #[no_mangle]
-pub extern "C" fn close() {
+pub extern "C" fn TauricClose() {
     if let Some(app_handle) = APP_HANDLE.lock().unwrap().clone() {
         app_handle.exit(0);
     }    
 }
 
 #[no_mangle]
-pub extern "C" fn run(identifier: *const c_char, product_name: *const c_char, icon_path: *const c_char) -> i32 {
+pub extern "C" fn TauricRun(identifier: *const c_char, product_name: *const c_char, icon_path: *const c_char, on_ready: Option<extern "C" fn()>) -> i32 {
     ctrlc::set_handler(move || {
-        close();
+        TauricClose();
     })
     .unwrap();
     let mut context = tauri::generate_context!();
@@ -102,6 +112,7 @@ pub extern "C" fn run(identifier: *const c_char, product_name: *const c_char, ic
     };
     config.identifier = identifier;
     config.product_name = Some(product_name);
+    config.app.with_global_tauri = true;
     if !icon_path.is_null() {
         
         let icon_path = unsafe {
@@ -109,15 +120,13 @@ pub extern "C" fn run(identifier: *const c_char, product_name: *const c_char, ic
         };
         
         config.bundle.icon = vec![icon_path.clone()];
-        println!("icons: {:?}", config.bundle.icon);
-        println!("custom icon {}", PathBuf::from(icon_path.clone()).exists());
         config.app.tray_icon = Some(TrayIconConfig{icon_path: PathBuf::from(icon_path), ..Default::default()});
     }
     
     
     let result = Builder::default()
-        .register_uri_scheme_protocol("mounted", |app, request| {
-            println!("local request");
+        .plugin(tauri_plugin_dialog::init())
+        .register_uri_scheme_protocol("fs", |_app, request| {
             let front_dir = FRONTEND_DIR.lock().unwrap();
             let front_dir_opt = front_dir.as_ref().unwrap();
             let mut request_path = request.uri().path();
@@ -127,7 +136,6 @@ pub extern "C" fn run(identifier: *const c_char, product_name: *const c_char, ic
                 request_path = request_path.strip_prefix("/").unwrap(); // Remove the leading '/'
             }
             let path = std::path::PathBuf::from(front_dir_opt).join(request_path);
-            println!("path is {}", path.display());
 
             if path.exists() {
                 let content = fs::read(path).unwrap();
@@ -135,26 +143,24 @@ pub extern "C" fn run(identifier: *const c_char, product_name: *const c_char, ic
                     .status(200)
                     .body(content)
                     .unwrap();
-                println!("result is {:?}", result);
                 return result;
             } else {
                 let result = tauri::http::Response::builder()
                     .status(404)
                     .body(Vec::new())
                     .unwrap();
-                println!("result is {:?}", result);
                 return result;
             }
         })
-        .setup(|app| {
+        .setup(move |app| {
             let mut app_handle = APP_HANDLE.lock().unwrap();
             
             *app_handle = Some(app.handle().clone());
 
-            tauri::async_runtime::spawn(async {
-                let ready_callback = READY_CALLBACK.lock().unwrap().clone();
-                if let Some(callback) = ready_callback {
-                    println!("calling ready callback");
+            let on_ready = on_ready.clone();
+
+            tauri::async_runtime::spawn(async move {
+                if let Some(callback) = on_ready {
                     callback();
                 }
             });
