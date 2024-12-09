@@ -35,7 +35,8 @@ class Tauri:
 
     def setup_functions(self) -> None:
         self.tauric.run.restype = ctypes.c_int
-        self.tauric.create_window.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+        self.tauric.run.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+        self.tauric.create_window.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
         self.tauric.create_window.restype = None
         self.tauric.close.restype = None
         self.tauric.on_ready.restype = None
@@ -62,11 +63,12 @@ class Tauri:
         path = path.encode('utf-8')
         self.tauric.mount_frontend(path)
 
-    def create_window(self, label: str, url: str) -> None:
+    def create_window(self, label: str, title: str, url: str) -> None:
         label_encoded = label.encode('utf-8')
         url_encoded = url.encode('utf-8')
+        title = title.encode('utf-8')
         print('Creating window...')
-        self.tauric.create_window(label_encoded, url_encoded)
+        self.tauric.create_window(label_encoded, title, url_encoded)
         print("Created an example window")
 
     def close(self) -> None:

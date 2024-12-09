@@ -8,8 +8,8 @@ from pathlib import Path
 def command_callback(message: bytes) -> None:
     print(f"Command: {message.decode('utf-8')}")
 
-def on_ready(tauric: Tauric) -> None:
-    tauric.create_window("example_window", "local://index.html")
+def on_ready(tauric: 'Tauri') -> None:
+    tauric.create_window("example_window", "tauric", "local://index.html")
 
 def main() -> None:
     tauric = Tauri("com.tauric.dev", "tauric")
