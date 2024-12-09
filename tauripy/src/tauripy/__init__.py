@@ -42,8 +42,11 @@ class Tauri:
         self.tauric.TauricOnReady.restype = None
         self.tauric.TauricOnCommand.restype = None
 
-    def on_command(self, command_c_callback) -> None:
-        self.tauric.TauricOnCommand(command_c_callback)
+    def on_command(self, command_callback) -> None:
+        # Most outlive static
+        self.command_callback = command_callback
+        self.command_callback_c = create_command_callback(self.command_callback)
+        self.tauric.TauricOnCommand(self.command_callback_c)
 
     def on_ready(self, ready_c_callback) -> None:
         self.tauric.TauricOnReady(ready_c_callback)
