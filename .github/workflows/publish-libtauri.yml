@@ -76,8 +76,8 @@ jobs:
           cp -f "target/release/libtauric.so" "${{ matrix.build-dir }}/" || :
 
           # Windows
-          cp -f "target/${{ matrix.target }}/release/tauri.lib" "${{ matrix.build-dir }}/" || :
-          cp -f "target/${{ matrix.target }}/release/tauri.dll" "${{ matrix.build-dir }}/" || :
+          cp -f "target/${{ matrix.target }}/release/tauric.lib" "${{ matrix.build-dir }}/" || :
+          cp -f "target/${{ matrix.target }}/release/tauric.dll" "${{ matrix.build-dir }}/" || :
         shell: bash
 
       - name: Create archive
