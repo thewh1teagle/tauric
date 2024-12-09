@@ -1,3 +1,3 @@
 [workspace]
-members = ["libtauric"]
+members = ["tauric"]
 resolver = "2"
