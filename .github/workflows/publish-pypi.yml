@@ -11,19 +11,19 @@ jobs:
       matrix:
         include:
           - platform: "macos-latest" # macOS arm64
-            archive: "libtauric-osx-aarch64.tar.gz"
+            archive: "tauric-osx-aarch64.tar.gz"
             wheel-tag: "py3-none-macosx_11_0_arm64"
 
           - platform: "macos-latest" # macOS x86-64
-            archive: "libtauric-osx-x86-64.tar.gz"
+            archive: "tauric-osx-x86-64.tar.gz"
             wheel-tag: "py3-none-macosx_10_12_x86_64"
 
           - platform: "ubuntu-22.04" # Linux x86_64
-            archive: "libtauric-linux-x86-64.tar.gz"
+            archive: "tauric-linux-x86-64.tar.gz"
             wheel-tag: "py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64"
 
           - platform: "windows-latest" # Windows x86_64
-            archive: "libtauric-win-x86-64.zip"
+            archive: "tauric-win-x86-64.zip"
             wheel-tag: "py3-none-win_amd64"
 
     runs-on: ${{ matrix.platform }}
@@ -35,7 +35,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
 
-      - name: Prepare libtauric
+      - name: Prepare tauric
         run: |
           # Download the archive
           curl -LO https://github.com/thewh1teagle/tauric/releases/latest/download/${{ matrix.archive }}
@@ -43,10 +43,10 @@ jobs:
           if [[ "${{ matrix.archive }}" == *.tar.gz ]]; then
             tar -xzf "${{ matrix.archive }}" -C .
           elif [[ "${{ matrix.archive }}" == *.zip ]]; then
-            7z x "${{ matrix.archive }}" -o"libtauric"
+            7z x "${{ matrix.archive }}" -o"tauric"
           fi
           # Copy appropriate shared libraries to the target directory
-          extracted_dir=$(find . -maxdepth 1 -type d -name 'libtauric*' | head -n 1)
+          extracted_dir=$(find . -maxdepth 1 -type d -name 'tauric*' | head -n 1)
           find "$extracted_dir" -type f \( -name "*.dll" -o -name "*.dylib" -o -name "*.so" \) -exec cp {} tauripy/src/tauripy/ \;
         shell: bash
 

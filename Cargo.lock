@@ -1907,7 +1907,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "libtauric"
+name = "tauric"
 version = "0.1.0"
 dependencies = [
  "cbindgen",
