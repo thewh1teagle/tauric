@@ -18,7 +18,7 @@ Potential: Use tauri from `Python`, `Go`, `TypeScript` etc..
 Python 🐍
 
 ```console
-pip install pyaec
+pip install tauripy
 ```
 
 ## Examples
