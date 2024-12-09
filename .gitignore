@@ -11,7 +11,6 @@ __pycache__/
 *.pyc
 *.exe
 *.dll
-tauric
 gen/
 venv/
 .DS_Store

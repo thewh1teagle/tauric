@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/capabilities.json",
+  "identifier": "main",
+  "permissions": [
+    "dialog:default"
+  ],
+  "windows": [
+    "*"
+  ],
+  "remote": {
+    "urls": [
+      "http://*",
+      "https://*"
+    ]
+  }
+}
