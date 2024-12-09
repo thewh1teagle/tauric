@@ -35,3 +35,10 @@ Then execute
 ```console
 cbindgen > tauric.h
 ```
+
+## Bundle python app
+
+```console
+pip install -U pyinstaller
+pyinstaller --noconsole --onefile --add-binary "venv/Lib/site-packages/tauripy/tauric.dll;." --add-data "dist;dist" --distpath "./build" main.py
+```

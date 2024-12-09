@@ -65,6 +65,7 @@ class Tauri:
             print("Tauri application started successfully")
 
     def mount_frontend(self, path) -> None:
+        path = str(path)
         path = path.encode('utf-8')
         self.tauric.TauricMountFrontend(path)
 
