@@ -36,7 +36,7 @@ class Tauri:
     def setup_functions(self) -> None:
         self.tauric.TauricRun.restype = ctypes.c_int
         self.tauric.TauricRun.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.CFUNCTYPE(None)]
-        self.tauric.TauricCreateWindow.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+        self.tauric.TauricCreateWindow.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
         self.tauric.TauricCreateWindow.restype = None
         self.tauric.TauricClose.restype = None
         self.tauric.TauricOnReady.restype = None
@@ -69,11 +69,15 @@ class Tauri:
         path = path.encode('utf-8')
         self.tauric.TauricMountFrontend(path)
 
-    def create_window(self, label: str, title: str, url: str) -> None:
+    def create_window(self, label: str, title: str, url: str, user_agent: str = None, width: int = None, height: int = None, maximized: bool = None) -> None:
         label_encoded = label.encode('utf-8')
         url_encoded = url.encode('utf-8')
         title = title.encode('utf-8')
-        self.tauric.TauricCreateWindow(label_encoded, title, url_encoded)
+        if user_agent:
+            user_agent_encoded = user_agent.encode('utf-8')
+        else:
+            user_agent_encoded = None
+        self.tauric.TauricCreateWindow(label_encoded, title, url_encoded, user_agent_encoded, width, height, maximized)
 
     def close(self) -> None:
         self.tauric.TauricClose()
