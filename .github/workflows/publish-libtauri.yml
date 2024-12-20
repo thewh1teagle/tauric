@@ -106,7 +106,7 @@ jobs:
   trigger-publish-pypi:
     name: Trigger publish-pypi
     needs: build
-    if: inputs.trigger-publish-pypi == 'true'
+    if: inputs.trigger-publish-pypi == true
     runs-on: ubuntu-latest
     steps:
       - name: Trigger publish-pypi
