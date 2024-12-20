@@ -113,3 +113,12 @@ jobs:
         run: gh workflow run publish-pypi.yml
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}    
+
+  checksum:
+    runs-on: macos-latest
+    needs: build
+    steps:
+      - name: Checksums Action
+        uses: thewh1teagle/checksum@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
