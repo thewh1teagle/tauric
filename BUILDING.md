@@ -42,3 +42,11 @@ cbindgen > tauric.h
 pip install -U pyinstaller
 pyinstaller --noconsole --onefile --add-binary "venv/Lib/site-packages/tauripy/tauric.dll;." --add-data "dist;dist" --distpath "./build" main.py
 ```
+
+## Test python package
+
+```console
+uv venv
+uv pip install -e ./tauripy
+cargo build && uv run examples/main.py
+```

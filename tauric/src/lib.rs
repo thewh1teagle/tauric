@@ -1,6 +1,6 @@
 use serde_json::Value;
 use std::{
-    ffi::{c_char, c_int, CStr, CString},
+    ffi::{c_char, CStr, CString},
     fs,
     path::PathBuf,
     str::FromStr,
@@ -67,9 +67,10 @@ pub extern "C" fn TauricCreateWindow(
     title: *const c_char,
     url: *const c_char,
     user_agent_ptr: *const c_char,
-    width_ptr: *const c_int,
-    height_ptr: *const c_int,
-    maximized_ptr: *const c_int,
+    width_ptr: i32,
+    height_ptr: i32,
+    maximized_ptr: i32,
+    center: i32,
 ) {
     let label = unsafe {
         assert!(!label.is_null());
@@ -89,18 +90,16 @@ pub extern "C" fn TauricCreateWindow(
         user_agent = Some(unsafe { CStr::from_ptr(user_agent_ptr).to_str().unwrap().to_owned() });
     }
 
-    let mut maximized = true;
-    if !maximized_ptr.is_null() {
-        maximized = unsafe { *maximized_ptr } != 0;
-    }
+    let maximized = maximized_ptr != 0;
+    
 
     let mut width = 800;
     let mut height = 600;
-    if !width_ptr.is_null() {
-        width = unsafe { *width_ptr };
+    if width_ptr != 0 {
+        width = width_ptr;
     }
-    if !height_ptr.is_null() {
-        height = unsafe { *width_ptr };
+    if height_ptr != 0 {
+        height = height_ptr;
     }
 
     let app_handle = APP_HANDLE.lock().unwrap().clone().unwrap();
@@ -119,6 +118,10 @@ pub extern "C" fn TauricCreateWindow(
 
     if let Some(user_agent) = user_agent {
         builder = builder.user_agent(&user_agent);
+    }
+
+    if center != 0 {
+        builder = builder.center();
     }
     
     builder.build()

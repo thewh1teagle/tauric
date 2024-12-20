@@ -1,14 +1,26 @@
 import ctypes
 import platform
 import os
+from pathlib import Path
 
 def load_library():
+    
     try:
         ext = ".dll" if platform.system() == "Windows" else ".so" if platform.system() == "Linux" else ".dylib"
         lib_name = "tauric" + ext if platform.system() == "Windows" else 'libtauric' + ext
 
         # Same dir as this file
         lib_path = os.path.join(os.path.dirname(__file__), lib_name)
+        
+        # In development
+        
+        target_folder = Path(__file__).parent / '../../../target'
+        if target_folder.exists():
+            target_folder = target_folder.resolve()
+            if target_folder.joinpath('release').exists():
+                lib_path = str(target_folder / f'release/{lib_name}')
+            elif target_folder.joinpath('debug').exists():
+                lib_path = str(target_folder / f'debug/{lib_name}')
 
         lib = ctypes.CDLL(lib_path)
 
@@ -36,7 +48,7 @@ class Tauri:
     def setup_functions(self) -> None:
         self.tauric.TauricRun.restype = ctypes.c_int
         self.tauric.TauricRun.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.CFUNCTYPE(None)]
-        self.tauric.TauricCreateWindow.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+        self.tauric.TauricCreateWindow.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
         self.tauric.TauricCreateWindow.restype = None
         self.tauric.TauricClose.restype = None
         self.tauric.TauricOnReady.restype = None
@@ -69,7 +81,7 @@ class Tauri:
         path = path.encode('utf-8')
         self.tauric.TauricMountFrontend(path)
 
-    def create_window(self, label: str, title: str, url: str, user_agent: str = None, width: int = None, height: int = None, maximized: bool = None) -> None:
+    def create_window(self, label: str, title: str, url: str, user_agent: str = None, width: int = 0, height: int = 0, maximized: bool = True, center: bool = True) -> None:
         label_encoded = label.encode('utf-8')
         url_encoded = url.encode('utf-8')
         title = title.encode('utf-8')
@@ -77,7 +89,7 @@ class Tauri:
             user_agent_encoded = user_agent.encode('utf-8')
         else:
             user_agent_encoded = None
-        self.tauric.TauricCreateWindow(label_encoded, title, url_encoded, user_agent_encoded, width, height, maximized)
+        self.tauric.TauricCreateWindow(label_encoded, title, url_encoded, user_agent_encoded, width, height, int(maximized), int(center))
 
     def close(self) -> None:
         self.tauric.TauricClose()
