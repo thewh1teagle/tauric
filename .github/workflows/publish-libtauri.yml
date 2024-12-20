@@ -3,7 +3,7 @@ name: Publish tauric
 on:
   workflow_dispatch:
     inputs:
-      publish-pypi:
+      trigger-publish-pypi:
         default: false
         required: false
         description: "Trigger publish-pypi after deply"
@@ -103,10 +103,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         shell: bash
         
-  publish-pypi:
+  trigger-publish-pypi:
     name: Trigger publish-pypi
     needs: build
-    if: inputs.publish-pypi == 'true'
+    if: inputs.trigger-publish-pypi == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger publish-pypi
